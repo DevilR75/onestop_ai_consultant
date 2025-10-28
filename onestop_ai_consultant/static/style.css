@@ -1,0 +1,138 @@
+:root{
+  --bg:#fff;
+  --text:#111;
+  --muted:#667085;
+  --primary:#1f87ff;
+  --primary-dark:#166ad6;
+  --border:#e5e7eb;
+  --green:#18a558;
+  --heart:#ff3b3b;
+}
+
+/*Global stylesheet for the*/
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+a{color:var(--primary);text-decoration:none}
+.container{max-width:1200px;margin:20px auto;padding:0 20px}
+
+/*Top bar styling*/
+.topbar{display:flex;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:10}
+.brand{font-weight:800;font-size:22px}
+.search{flex:1}
+.search input{width:100%;border:1px solid var(--border);border-radius:999px;padding:10px 14px}
+.icon-btn{background:#f5f7fb;border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer}
+.icon-btn:hover{background:#eef2ff}
+
+/*Grid layout for the*/
+.product-grid{display:grid;grid-template-columns:1.2fr 1fr 320px;gap:24px;margin-top:24px}
+.left .main-image{border:1px solid var(--border);border-radius:14px;padding:8px;display:flex;align-items:center;justify-content:center;min-height:420px;background:#fafafa}
+.left .main-image img{max-width:100%;max-height:400px;object-fit:contain;border-radius:12px}
+.thumbs{display:flex;gap:10px;align-items:center;margin-top:10px}
+.thumbs .thumb{width:86px;height:86px;border:2px solid #e6e6e6;border-radius:12px;object-fit:cover;cursor:pointer}
+.thumbs .thumb.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(31,135,255,.18)}
+.pill{border:0;background:#e7f0ff;color:#0b63d1;padding:10px 14px;border-radius:14px;cursor:pointer;font-weight:600}
+
+/*Key features list*/
+.key-features{margin-top:14px}
+.key-features h3{margin:6px 0 8px}
+.key-features ul{padding-left:18px;margin:0}
+.key-features li{margin:2px 0;color:#333}
+
+/*Center column styling*/
+.center .title{margin:0 0 6px}
+.rating{color:#ffb400;margin-bottom:10px}
+.label{display:block;font-size:14px;color:var(--muted);margin-top:10px}
+.select-row select{padding:8px 10px;border:1px solid var(--border);border-radius:10px}
+.swatches{display:flex;gap:10px;margin:8px 0}
+.swatch{width:34px;height:34px;border-radius:999px;border:2px solid var(--border);background:var(--sw);cursor:pointer}
+.caps{display:flex;gap:10px;margin:8px 0}
+.cap{border:1px solid var(--border);padding:8px 12px;border-radius:10px;background:#fff;cursor:pointer}
+.cap:hover{background:#f7f7f7}
+
+/*Pricing and CTA*/
+.price-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.price{font-size:28px;font-weight:800;color:#e61e1e}
+.badge{background:#ffefef;color:#e61e1e;border-radius:999px;padding:4px 10px;font-weight:700}
+.cta-row{display:flex;align-items:center;gap:10px;margin-top:12px}
+.btn-primary{background:var(--primary);color:#fff;border:0;border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:700}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#e7f0ff;color:#0b63d1;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}
+/*
+ * Heart icon button styling
+ * The default icon-btn padding caused the heart glyph to appear squashed because
+ * its width and height were driven by the text width rather than a fixed size.
+ * Override the icon button styles when the heart class is present to ensure
+ * the heart is centered and rendered at an appropriate size.  Increase the
+ * font-size and set explicit width/height to create a square button that
+ * encloses the heart evenly.
+ */
+.icon-btn.heart{
+  color:var(--heart);
+  /* Increase the font size of the heart to better fill the button */
+  font-size:28px;
+  width:44px;
+  height:44px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+/* Ensure the heart button still uses the default icon button background and border */
+.icon-btn.heart:hover{
+  background:#eef2ff;
+}
+
+/*Trust indicators and shipping*/
+.trust{display:flex;gap:16px;margin:10px 0}
+.trust .ok{color:var(--green);font-weight:600}
+.eta{border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}
+.eta-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.postcode{border:1px solid var(--border);border-radius:10px;padding:8px 10px;max-width:150px}
+.eta-list{display:grid;gap:6px}
+.eta-item{display:flex;justify-content:space-between;border-bottom:1px dashed #eee;padding:6px 0}
+.policy{margin-top:8px;color:#333;font-weight:600}
+
+/*Right column sticky panel*/
+.right .panel{position:sticky;top:86px;border:1px solid var(--border);border-radius:14px;padding:12px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.small{padding:8px 12px;border-radius:10px}
+.links{list-style:none;margin:0;padding:0}
+.links li{padding:8px 0;border-bottom:1px dashed #eee}
+.links a{font-weight:600}
+
+/*Chat widget*/
+.chat{position:fixed;right:22px;bottom:22px;width:520px;height:70vh;max-height:92vh;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden;z-index:40}
+.chat.hidden{display:none}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);background:#f8fafc}
+.chat-body{padding:10px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;background:#fbfcfe}
+.bubble{padding:10px 12px;border-radius:14px;max-width:90%}
+.bubble.user{align-self:flex-end;background:#e7f0ff}
+.bubble.ai{align-self:flex-start;background:#eefbee}
+.chat-input{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-input input{flex:1;border:1px solid var(--border);border-radius:10px;padding:10px}
+/*The model select class*/
+.model-select{}
+
+/*Floating chat button*/
+.chat-fab{
+  position:fixed;right:22px;bottom:22px;width:56px;height:56px;
+  border:0;border-radius:999px;background:var(--primary);color:#fff;
+  font-size:24px;box-shadow:0 10px 25px rgba(0,0,0,.22);cursor:pointer;z-index:30;
+}
+.chat-fab.hidden{display:none}
+
+/*Modal for 3D viewer*/
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.modal.hidden{display:none}
+.modal-card{background:#fff;border-radius:14px;max-width:680px;width:92%;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border)}
+.modal-body{padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.sketchfab-embed-wrapper{width:100%}
+.sketchfab-embed-wrapper iframe{width:100%;height:480px;border:0;border-radius:12px;background:#000}
+
+.muted{color:#667085;font-size:14px}
+
+@media (max-width: 1000px){
+  .product-grid{grid-template-columns:1fr}
+  .right{order:3}
+}

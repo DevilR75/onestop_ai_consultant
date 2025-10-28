@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% block title %}{{ product.name }} · OneStop{% endblock %}
+{% block content %}
+<div class="product-grid">
+  <section class="left">
+    <div class="gallery">
+      <div class="main-image">
+        <img id="mainImg" src="{{ product.images[0] }}" alt="{{ product.name }}">
+      </div>
+      <div class="thumbs">
+        {% for img in product.images %}
+        <img class="thumb {% if loop.first %}active{% endif %}" src="{{ img }}" onclick="swapThumb(this)" alt="thumb {{ loop.index }}">
+        {% endfor %}
+        <button class="pill" onclick="open3D()">3D Viewer</button>
+      </div>
+    </div>
+    <div class="key-features">
+      <h3>Key features:</h3>
+      <ul>
+        {% for f in product.key_features %}
+          <li>{{ f }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <section class="center">
+    <h1 class="title">{{ product.name }}</h1>
+    <div class="rating">⭐️⭐️⭐️⭐️⭐️ <span>{{ '%.1f'|format(product.rating) }}</span></div>
+
+    <label class="label">Range</label>
+    <div class="select-row">
+      <select>
+        <option>{{ product.range }}</option>
+      </select>
+    </div>
+
+    <label class="label">Colour: <strong>Titanium Whitesilver</strong></label>
+    <div class="swatches">
+      {% for c in product.colors %}
+        <button class="swatch" title="{{ c.name }}" style="--sw: {{ c.hex }}"></button>
+      {% endfor %}
+    </div>
+
+    <label class="label">Capacity</label>
+    <div class="caps">
+      {% for cap in product.capacities %}
+        <button class="cap">{{ cap }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="price-row">
+      <div class="price">{{ product.price_aud }} AUD$</div>
+      <span class="badge">-{{ product.discount_percent }}% OFF</span>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn-primary" onclick="addToCart()">Add to cart</button>
+      <button class="icon-btn heart" onclick="toggleHeart()">♥</button>
+    </div>
+
+    <div class="trust">
+      <span class="ok">✔ In stock</span>
+      <span>🚚 Free delivery</span>
+    </div>
+
+    <button class="btn-secondary" onclick="openChat()">Ask OneStop AI</button>
+
+    <div class="eta">
+      <div class="eta-row">
+        <div>Delivery ETA</div>
+        <input id="postcode" class="postcode" placeholder="Postcode" maxlength="10" oninput="updateEta()">
+      </div>
+      <div class="eta-list">
+        <!--
+          Show the shipping cost directly after the delivery type. The cost is
+          hard‑coded here to avoid any client‑side manipulation and to keep
+          the markup simple. Keeping the <span> elements with their original
+          IDs allows the updateEta() JavaScript function to continue
+          replacing only the date portion. Costs appear immediately after
+          the shipping type and before the ETA, as requested.
+        -->
+        <div class="eta-item">
+          <strong>Standard (10&nbsp;AUD)</strong>
+          <span id="etaStandard">—</span>
+        </div>
+        <div class="eta-item">
+          <strong>Express (15&nbsp;AUD)</strong>
+          <span id="etaExpress">—</span>
+        </div>
+      </div>
+      <div class="policy">
+        Free shipping on orders over {{ product.free_shipping_threshold }} AUD$<br/>
+        {{ product.returns_policy }}
+      </div>
+    </div>
+  </section>
+
+  <aside class="right">
+    <div class="panel">
+      <div class="panel-head">
+        <div>Virtual AI Consultant</div>
+        <button class="btn-primary small" onclick="openChat()">Ask</button>
+      </div>
+      <ul class="links">
+        <li><a href="#" onclick="preAsk('Compare')">Compare</a></li>
+        <li><a href="#" onclick="preAsk('What\'s in the box?')">What's in the box?</a></li>
+        <li><a href="#" onclick="preAsk('Warranty')">Warranty</a></li>
+        <li><a href="#" onclick="preAsk('Delivery')">Delivery</a></li>
+        <li><a href="#" onclick="preAsk('Returns')">Returns</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<div id="chatWidget" class="chat hidden" data-slug="{{ slug }}">
+  <div class="chat-head">
+    <strong>OneStop AI Consultant</strong>
+
+    <!--The chat uses the-->
+
+    <button class="icon-btn" onclick="closeChat()">✕</button>
+  </div>
+  <div id="chatBody" class="chat-body"></div>
+  <div class="chat-input">
+    <input id="chatMsg" type="text" placeholder="Ask about {{ product.name }}..." onkeydown="if(event.key==='Enter'){sendMsg()}"/>
+    <button class="btn-primary" onclick="sendMsg()">Send</button>
+  </div>
+</div>
+
+<button id="chatFab" class="chat-fab" title="Chat with OneStop AI" onclick="openChat()">💬</button>
+
+<div id="modal3d" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <strong>3D Viewer</strong>
+      <button class="icon-btn" onclick="close3D()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="sketchfab-embed-wrapper">
+        <iframe title="Samsung Galaxy S25 Ultra v1"
+                frameborder="0"
+                allowfullscreen
+                mozallowfullscreen="true"
+                webkitallowfullscreen="true"
+                allow="autoplay; fullscreen; xr-spatial-tracking"
+                xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share
+                src="https://sketchfab.com/models/db03971b59004f4489208eef033dfdbe/embed">
+        </iframe>
+      </div>
+      <p class="muted">3D model via Sketchfab prototype embed</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
