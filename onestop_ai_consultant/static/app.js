@@ -1,6 +1,6 @@
-/*Client side script for*/
+// Client-side interactions
 
-// Set the main image
+// Show clicked thumbnail as main image
 function swapThumb(el) {
   const main = document.getElementById('mainImg');
   if (el && el.src) {
@@ -12,19 +12,19 @@ function swapThumb(el) {
   }
 }
 
-// Display a simple confirmation
+// Simple cart message
 function addToCart() {
   alert('Added to cart');
 }
 
-// Toggle the state
+// Toggle the wishlist heart and rely on CSS for appearance
 function toggleHeart() {
   const btn = document.querySelector('.heart');
+  if (!btn) return;
   btn.classList.toggle('active');
-  btn.textContent = btn.classList.contains('active') ? '❤' : '♥';
 }
 
-// Open the chat widget
+// Open chat window
 function openChat() {
   document.getElementById('chatWidget').classList.remove('hidden');
   const fab = document.getElementById('chatFab');
@@ -36,7 +36,7 @@ function openChat() {
   loadHistory();
 }
 
-// Close the chat widget
+// Close chat window
 function closeChat() {
   document.getElementById('chatWidget').classList.add('hidden');
   const fab = document.getElementById('chatFab');
@@ -45,7 +45,7 @@ function closeChat() {
   }
 }
 
-// Pre fill the chat
+// Pre-fill chat with a topic
 function preAsk(topic) {
   openChat();
   const el = document.getElementById('chatMsg');
@@ -53,7 +53,7 @@ function preAsk(topic) {
   el.focus();
 }
 
-// Send the user message note This function constructs
+// Send user message to the backend
 async function sendMsg() {
   const input = document.getElementById('chatMsg');
   const msg = input.value.trim();
@@ -86,7 +86,7 @@ async function sendMsg() {
   body.scrollTop = body.scrollHeight;
 }
 
-// Append a chat bubble
+// Add a chat bubble to the window
 function appendBubble(container, text, who) {
   const b = document.createElement('div');
   b.className = 'bubble ' + who;
@@ -94,7 +94,7 @@ function appendBubble(container, text, who) {
   container.appendChild(b);
 }
 
-// Load recent chat history
+// Fetch and display recent chat history
 async function loadHistory() {
   const widget = document.getElementById('chatWidget');
   const slug = widget.dataset.slug || 'galaxy-s25-ultra';
@@ -108,30 +108,30 @@ async function loadHistory() {
         appendBubble(body, item.user, 'user');
       }
       if (item.ai) {
-        // Show AI message
+        // Show AI reply
         const text = item.ai;
         appendBubble(body, text, 'ai');
       }
     });
     body.scrollTop = body.scrollHeight;
   } catch (e) {
-    // Ignore history errors
+    // Ignore errors when loading history
   }
 }
 
-// Request delivery estimates
+// Update delivery estimates based on postcode
 async function updateEta() {
   const pcInput = document.getElementById('postcode');
   const pc = pcInput ? pcInput.value.trim() : '';
   const stdSpan = document.getElementById('etaStandard');
   const expSpan = document.getElementById('etaExpress');
-  // If no postcode is entered, reset the ETA displays to the placeholder
+  // Clear ETA when postcode is empty
   if (!pc) {
     if (stdSpan) stdSpan.textContent = '—';
     if (expSpan) expSpan.textContent = '—';
     return;
   }
-  // Fetch the delivery estimate from the server
+  // Ask the server for ETA
   const res = await fetch('/api/eta', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -142,17 +142,17 @@ async function updateEta() {
   if (expSpan) expSpan.textContent = data.express;
 }
 
-// Show the 3D modal
+// Open 3D viewer
 function open3D() {
   document.getElementById('modal3d').classList.remove('hidden');
 }
 
-// Hide the 3D modal
+// Close 3D viewer
 function close3D() {
   document.getElementById('modal3d').classList.add('hidden');
 }
 
-// On initial load mark
+// Activate first thumbnail on page load
 document.addEventListener('DOMContentLoaded', function () {
   const first = document.querySelector('.thumb');
   if (first && !first.classList.contains('active')) {

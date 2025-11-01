@@ -56,7 +56,12 @@
 
     <div class="cta-row">
       <button class="btn-primary" onclick="addToCart()">Add to cart</button>
-      <button class="icon-btn heart" onclick="toggleHeart()">♥</button>
+      <!-- Wishlist heart button: inline SVG toggled by CSS -->
+      <button class="icon-btn heart" onclick="toggleHeart()" aria-label="Add to wishlist">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
     </div>
 
     <div class="trust">
@@ -72,14 +77,7 @@
         <input id="postcode" class="postcode" placeholder="Postcode" maxlength="10" oninput="updateEta()">
       </div>
       <div class="eta-list">
-        <!--
-          Show the shipping cost directly after the delivery type. The cost is
-          hard‑coded here to avoid any client‑side manipulation and to keep
-          the markup simple. Keeping the <span> elements with their original
-          IDs allows the updateEta() JavaScript function to continue
-          replacing only the date portion. Costs appear immediately after
-          the shipping type and before the ETA, as requested.
-        -->
+        <!-- Hard-coded shipping costs; ETA dates updated via JavaScript -->
         <div class="eta-item">
           <strong>Standard (10&nbsp;AUD)</strong>
           <span id="etaStandard">—</span>
@@ -117,7 +115,7 @@
   <div class="chat-head">
     <strong>OneStop AI Consultant</strong>
 
-    <!--The chat uses the-->
+    <!-- Chat header -->
 
     <button class="icon-btn" onclick="closeChat()">✕</button>
   </div>
