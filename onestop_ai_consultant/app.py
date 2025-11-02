@@ -1,10 +1,10 @@
 # Group 3
 """
-This module implements a minimal e-commerce product page with an embedded chat
-assistant.  The application is built using Flask and uses a local language model
-server (Ollama) to answer user questions about the product.  Only one model is
-used at a time.  You can choose which model the server uses by setting the
-environment variable OLLAMA_MODEL before starting the app.
+This file sets up a simple online store page with an embedded chat assistant for
+a sample product. It uses Flask to serve the web pages and sends users' questions
+to a local language model server (Ollama) to generate answers. Only one model is
+active at a time and you can select which model to use by setting the
+``OLLAMA_MODEL`` environment variable before starting the app.
 """
 
 # Import Flask classes
@@ -89,14 +89,13 @@ PRODUCTS: dict[str, dict[str, any]] = {
 
 def init_db() -> None:
     """
-    Create the chat history database if it does not already exist.
+    Create the SQLite database used to store chat history if it is not already present.
 
-    This function sets up a simple SQLite database with a single
-    table called chat_logs.  Each row stores the timestamp of the
-    exchange, the product slug, the user message, the assistant
-    response, and the model tag.  If the table already exists
-    nothing will be changed.  The database file is stored at
-    DB_PATH.
+    The database contains a single table named ``chat_logs``. Each row records when the
+    conversation happened, which product was discussed, what the user asked, what the
+    assistant replied, and which model generated the reply. Calling this function
+    multiple times is safe; it will not overwrite an existing table. The database
+    lives at the path defined by ``DB_PATH``.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -118,14 +117,14 @@ def init_db() -> None:
 
 def warmup_model() -> None:
     """
-    Warm up the default language model to reduce first response latency.
+    Send a dummy request to the language model so the first real user message isn't delayed.
 
-    When the server starts the model may not be loaded into memory yet.  To
-    avoid a slow first reply we call the local model server with a dummy
-    prompt.  The keep_alive flag tells the server to keep the model in
-    memory for two hours so subsequent requests are fast.  Any errors
-    during this warmup are ignored so that the web server still
-    starts.
+    When the web server starts up, the language model may not yet be loaded into memory.
+    This helper makes a throwaway call to the Ollama server with a blank prompt. The
+    ``keep_alive`` flag asks the model server to keep the model warm for two hours so
+    subsequent requests are handled quickly. If this warm‑up call fails for any reason,
+    the exception is ignored and the web server still starts; the model will simply
+    be loaded the first time a user asks a question.
     """
     try:
         requests.post(
@@ -140,22 +139,22 @@ def warmup_model() -> None:
             timeout=600,
         )
     except Exception:
-        # If the model server user request will load
+        # Ignore any errors; the model will load when a user asks a question.
         pass
 
 
 def save_log(product_slug: str, user_msg: str, ai_reply: str) -> None:
     """
-    Persist a chat exchange to the SQLite database.
+    Save one question–answer pair to the chat history database.
 
-    Each call inserts one row into the chat_logs table.  The current
-    timestamp is recorded along with the product slug, the user
-    message, the assistant reply, and the configured model tag.
+    This function inserts a single row into the ``chat_logs`` table, capturing the time
+    of the exchange, which product the question relates to, what the user asked,
+    the assistant's reply, and which model produced the answer.
 
     Args:
-        product_slug: Identifier for the product for example "galaxy-s25-ultra".
-        user_msg: The user's message text.
-        ai_reply: The assistant's response text.
+        product_slug: identifier for the product, e.g. ``"galaxy-s25-ultra"``.
+        user_msg: the user's message.
+        ai_reply: the assistant's response.
     """
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -175,18 +174,18 @@ def save_log(product_slug: str, user_msg: str, ai_reply: str) -> None:
 
 def product_context(slug: str) -> str:
     """
-    Construct a context string describing a product.
+    Build a brief description of a product to provide context to the language model.
 
-    This helper looks up a product by its slug and builds a sentence
-    summarizing its name, key features, price and shipping details.  The
-    returned string is used to give the language model context about
-    the product when formulating a response.
+    It looks up the product identified by ``slug`` and composes a sentence that includes
+    the product name, its key features, price, and any available shipping information.
+    This summary is prepended to the user's question before sending it to the model
+    so that the AI has relevant context.
 
     Args:
-        slug: The product slug.
+        slug: the identifier for the product.
 
     Returns:
-        A short description summarizing the product's key features, price and shipping information.
+        A string summarizing the product's main features, price and shipping details.
     """
     p = PRODUCTS.get(slug, {})
     features = "; ".join(p.get("key_features", []))
@@ -208,11 +207,10 @@ def product_context(slug: str) -> str:
 @app.route("/")
 def home():
     """
-    Redirect the root URL to the default product page.
+    Redirect visitors from the site root to the demo product page.
 
-    When the user visits the site root we do not show an index page
-    but immediately redirect them to the product page for our demo
-    phone.  This keeps the interface simple for the prototype.
+    Rather than showing a separate home page, anyone visiting ``/`` is sent directly
+    to the page for the sample phone. This keeps the prototype simple.
     """
     return redirect("/product/galaxy-s25-ultra")
 
@@ -220,18 +218,18 @@ def home():
 @app.route("/product/<slug>")
 def product(slug: str):
     """
-    Render the product page for a given product slug.
+    Display the web page for a given product.
 
-    If the slug is not found in the PRODUCTS dictionary we return
-    a 404 error.  Otherwise we pass the product data to the template
-    for rendering.  The default_model value is no longer used in
-    the template but remains for backward compatibility.
+    If the requested slug isn't in the ``PRODUCTS`` dictionary we return a 404 error.
+    Otherwise, we look up the product details and render them with the ``product.html``
+    template. The ``default_model`` field is kept for backward compatibility but is
+    currently unused by the template.
 
     Args:
-        slug: The product slug from the URL path.
+        slug: the product identifier from the URL.
 
     Returns:
-        A rendered HTML page or a tuple with an error string and status code.
+        A rendered page or ``("Product not found", 404)`` if the product doesn't exist.
     """
     if slug not in PRODUCTS:
         return "Product not found", 404
@@ -246,26 +244,24 @@ def product(slug: str):
 @app.route("/api/ask", methods=["POST"])
 def api_ask():
     """
-    Receive a chat message and return a model reply.
+    Process a chat message from the front‑end and return the AI's reply.
 
-    This endpoint expects a JSON body with the keys 'message' and
-    'slug'.  It builds a prompt using the product context and the
-    user question then sends it to the configured language model.
-    The reply is streamed back and concatenated into a single string.
-    The exchange is recorded in the history database.  We do not
-    allow the client to choose a different model; the server always
-    uses OLLAMA_MODEL.
+    The client sends a JSON payload with ``message`` and ``slug``. We prepend a
+    short description of the product to the user's question and send it to the
+    configured language model. The response is streamed back piece‑by‑piece and
+    assembled into a single string. We also save the conversation to the history
+    database. Clients cannot choose a different model via this endpoint; we always
+    use the model defined in ``OLLAMA_MODEL``.
     """
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or "").strip()
     slug = data.get("slug", "galaxy-s25-ultra")
     if not message:
         return jsonify({"reply": "Please enter a question."})
-    # Quick reply for shipping cost questions.  If the user asks about shipping
-    # cost or delivery cost, respond with the known shipping prices without
-    # invoking the language model.  This improves accuracy and ensures the
-    # model does not hallucinate generic shipping advice.  Keywords cover
-    # English and Russian terms for shipping cost.
+    # Quick reply for shipping cost questions. If the user asks about shipping
+    # costs or delivery costs, we respond with the known shipping prices rather than
+    # invoking the language model. This improves accuracy and prevents the model from
+    # hallucinating generic shipping advice. The keyword list includes common English phrases for shipping costs.
     msg_lower = message.lower()
     shipping_keywords = [
         "shipping cost",
@@ -274,9 +270,6 @@ def api_ask():
         "shipping price",
         "shipping fee",
         "shipping charges",
-        "стоимость доставки",
-        "цена доставки",
-        "доставка"
     ]
     if any(k in msg_lower for k in shipping_keywords):
         p = PRODUCTS.get(slug, {})
@@ -294,7 +287,7 @@ def api_ask():
         # Record the chat exchange
         save_log(slug, message, reply_text)
         return jsonify({"reply": reply_text})
-    # Always use the configured model tag
+    # Use the configured model tag
     model_tag = OLLAMA_MODEL
     # Build the prompt including extended product context (price and shipping info)
     context = product_context(slug)
@@ -336,10 +329,11 @@ def api_ask():
 
 @app.route("/api/history", methods=["GET"])
 def api_history():
-    """Return recent chat history for a given product.
+    """
+    Return recent chat history for a given product.
 
-    The 'slug' query parameter identifies the product; 'limit'
-    controls how many recent exchanges to return.
+    The ``slug`` query parameter selects which product's history to retrieve. The
+    ``limit`` parameter controls how many of the most recent exchanges to return.
     """
     slug = request.args.get("slug", "galaxy-s25-ultra")
     try:
@@ -370,10 +364,11 @@ def api_history():
 
 @app.route("/api/eta", methods=["POST"])
 def api_eta():
-    """Return a simple delivery estimate based on business days.
+    """
+    Provide an estimated delivery date range using business days.
 
-    The postcode is ignored in this demo implementation; you may
-    enhance this endpoint to consult a real shipping API.
+    For this demo we ignore the postcode entirely. A real implementation might
+    consult a shipping API to estimate delivery more accurately.
     """
     data = request.get_json(silent=True) or {}
     today = datetime.date.today()
