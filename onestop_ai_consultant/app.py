@@ -1,4 +1,4 @@
-# Group 3
+# Group 3: Dmitriy Maul (A00122400) , Samisha Verma (A00120599) , Abdulloh Kodirov (A00159931)
 """
 This file sets up a simple online store page with an embedded chat assistant for
 a sample product. It uses Flask to serve the web pages and sends users' questions
