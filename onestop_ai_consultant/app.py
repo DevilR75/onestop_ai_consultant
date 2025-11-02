@@ -122,7 +122,7 @@ def warmup_model() -> None:
     When the web server starts up, the language model may not yet be loaded into memory.
     This helper makes a throwaway call to the Ollama server with a blank prompt. The
     ``keep_alive`` flag asks the model server to keep the model warm for two hours so
-    subsequent requests are handled quickly. If this warm‑up call fails for any reason,
+    subsequent requests are handled quickly. If this warm-up call fails for any reason,
     the exception is ignored and the web server still starts; the model will simply
     be loaded the first time a user asks a question.
     """
@@ -145,7 +145,7 @@ def warmup_model() -> None:
 
 def save_log(product_slug: str, user_msg: str, ai_reply: str) -> None:
     """
-    Save one question–answer pair to the chat history database.
+    Save one question-answer pair to the chat history database.
 
     This function inserts a single row into the ``chat_logs`` table, capturing the time
     of the exchange, which product the question relates to, what the user asked,
@@ -244,11 +244,11 @@ def product(slug: str):
 @app.route("/api/ask", methods=["POST"])
 def api_ask():
     """
-    Process a chat message from the front‑end and return the AI's reply.
+    Process a chat message from the front-end and return the AI's reply.
 
     The client sends a JSON payload with ``message`` and ``slug``. We prepend a
     short description of the product to the user's question and send it to the
-    configured language model. The response is streamed back piece‑by‑piece and
+    configured language model. The response is streamed back piece-by-piece and
     assembled into a single string. We also save the conversation to the history
     database. Clients cannot choose a different model via this endpoint; we always
     use the model defined in ``OLLAMA_MODEL``.
